@@ -1,0 +1,51 @@
+name: CI/CD Workflow [PROD]
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on closed pull request events only for the "main" branch
+  pull_request: 
+    types: closed
+    branches:
+      - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Get project's code from branch
+      - name: Checkout branch
+        uses: actions/checkout@v3
+        
+      # Autenticate to be able to deploy the app
+      - name: 'Authenticate to Google Cloud'
+        id: 'auth'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.GCP_PROJECT_CREDENTIALS_PROD }}'
+
+      # Add serviceAccountKey file so the app is able to connect with Google Cloud
+      - name: Add Keys
+        run: |
+            echo '${{ secrets.GCP_PROJECT_CREDENTIALS_PROD }}' >> serviceAccountKey.json
+        shell: bash
+      
+      # Install gcloud, `setup-gcloud` automatically picks up authentication from `auth`.
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
+
+      # Deploy application to Google Cloud
+      - id: 'gcloud'
+        name: 'Deploy App'
+        # gcloud app create should be run once
+        run: |
+            gcloud app create
+            gcloud app deploy
+        shell: bash
