@@ -44,8 +44,6 @@ jobs:
       # Deploy application to Google Cloud
       - id: 'gcloud'
         name: 'Deploy App'
-        # gcloud app create should be run once
         run: |
-            gcloud app create
             gcloud app deploy
         shell: bash
