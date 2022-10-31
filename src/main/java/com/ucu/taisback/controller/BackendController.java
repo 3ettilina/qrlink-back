@@ -1,5 +1,6 @@
 package com.ucu.taisback.controller;
 
+import com.ucu.taisback.entity.Product;
 import com.ucu.taisback.exceptions.ProductNotFoundException;
 import com.ucu.taisback.service.FirebaseService;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,4 +32,8 @@ public class BackendController {
      return redirectView;
     }
 
+  @GetMapping("/admin/product")
+  Product getProductInformation(@RequestParam String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
+    return firebaseService.getProduct(gtin);
+  }
 }
