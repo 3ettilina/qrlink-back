@@ -10,4 +10,5 @@ public class Product {
   private String gtin;
   private String name;
   private String resource_url;
+  private Resource[] resources;
 }
