@@ -34,9 +34,9 @@ public class FirebaseService {
     Product product = getProduct(id);
     ArrayList<Resource> resources = Optional.ofNullable(product.getResources())
             .orElse(new ArrayList<>());
-   if(!resources.stream()
+   if(resources.stream()
             .filter(resource1 -> Objects.nonNull(resource1.getLanguage()) && Objects.nonNull(resource1.getLink_type()))
-            .anyMatch(resource1 -> resource1.getLanguage().equals(resource.getLanguage())
+            .noneMatch(resource1 -> resource1.getLanguage().equals(resource.getLanguage())
             && resource1.getLink_type().equals(resource.getLink_type()))){
      resources.add(resource);
      product.setResources(resources);
