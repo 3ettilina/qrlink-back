@@ -43,7 +43,8 @@ public class FirebaseService {
      ApiFuture<WriteResult> writeResultApiFuture = firestore.collection("products").document(id).set(product);
    }
    else{
-      //TODO: definir que hacer si ya existe el recurso
+     //TODO: definir status code y eso
+      throw new ProductNotFoundException("El recurso ya existe");
    }
 
   }
