@@ -12,6 +12,7 @@ import com.ucu.taisback.exceptions.ProductNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
@@ -33,8 +34,17 @@ public class FirebaseService {
     Product product = getProduct(id);
     ArrayList<Resource> resources = Optional.ofNullable(product.getResources())
             .orElse(new ArrayList<>());
-    resources.add(resource);
-    product.setResources(resources);
-    ApiFuture<WriteResult> writeResultApiFuture = firestore.collection("products").document(id).set(product);
+   if(!resources.stream()
+            .filter(resource1 -> Objects.nonNull(resource1.getLanguage()) && Objects.nonNull(resource1.getLink_type()))
+            .anyMatch(resource1 -> resource1.getLanguage().equals(resource.getLanguage())
+            && resource1.getLink_type().equals(resource.getLink_type()))){
+     resources.add(resource);
+     product.setResources(resources);
+     ApiFuture<WriteResult> writeResultApiFuture = firestore.collection("products").document(id).set(product);
+   }
+   else{
+      //TODO: definir que hacer si ya existe el recurso
+   }
+
   }
 }

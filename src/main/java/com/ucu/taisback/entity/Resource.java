@@ -7,8 +7,8 @@ import lombok.Setter;
 @Setter
 public class Resource {
   private String name;
-  private String linkType;
+  private String link_type;
   private String language;
-  private String resourceUrl;
+  private String resource_url;
 }
 

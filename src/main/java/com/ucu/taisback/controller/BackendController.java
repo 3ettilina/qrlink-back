@@ -35,13 +35,13 @@ public class BackendController {
      return redirectView;
     }
 
-  @GetMapping("/admin/product")
-  Product getProductInformation(@RequestParam String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
-    return firebaseService.getProduct(gtin);
-  }
+    @GetMapping("/admin/product")
+    Product getProductInformation(@RequestParam String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
+      return firebaseService.getProduct(gtin);
+    }
 
-  @PostMapping("/product/addResource")
-  void addResource(@RequestParam String gtin,  @RequestBody Resource resource) throws InterruptedException, ExecutionException, ProductNotFoundException {
-    firebaseService.updateResources(gtin, resource);
-  }
+    @PostMapping("/product/addResource")
+    void addResource(@RequestParam String gtin,  @RequestBody Resource resource) throws InterruptedException, ExecutionException, ProductNotFoundException {
+      firebaseService.updateResources(gtin, resource);
+    }
 }
