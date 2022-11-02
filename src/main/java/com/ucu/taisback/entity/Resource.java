@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Resource {
-
-  private String linkType;
+  private String name;
+  private String link_type;
   private String language;
-  private String resourceUrl;
+  private String resource_url;
 }
 
