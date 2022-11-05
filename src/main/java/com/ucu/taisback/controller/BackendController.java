@@ -1,17 +1,17 @@
 package com.ucu.taisback.controller;
 
+import com.google.common.net.HttpHeaders;
 import com.ucu.taisback.entity.Product;
 import com.ucu.taisback.entity.Resource;
 import com.ucu.taisback.exceptions.ProductNotFoundException;
 import com.ucu.taisback.service.FirebaseService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import com.ucu.taisback.service.implementation.ReturnInfoFromQRImplementation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.concurrent.ExecutionException;
 
@@ -24,15 +24,10 @@ public class BackendController {
     this.firebaseService = firebaseService;
   }
 
-  @Value("${TARGET:World}")
-  String target;
-
-
-    @GetMapping("/getProduct")
-    RedirectView returnInfoFromQR(@RequestParam String productId) throws InterruptedException, ExecutionException, ProductNotFoundException {
-     RedirectView redirectView =  new RedirectView(firebaseService.getProduct(productId).getResource_url());
-     redirectView.setStatusCode(HttpStatus.TEMPORARY_REDIRECT);
-     return redirectView;
+    @GetMapping("/getProductResources")
+    Product returnInfoFromQR(@RequestHeader(HttpHeaders.ACCEPT_LANGUAGE) String languageHeader,
+            @RequestParam String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
+     return ReturnInfoFromQRImplementation.returnInfoFromQR(firebaseService.getProduct(gtin),languageHeader);
     }
 
     @GetMapping("/admin/product")

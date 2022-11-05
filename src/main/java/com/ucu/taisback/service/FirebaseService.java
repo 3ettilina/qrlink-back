@@ -21,8 +21,8 @@ import java.util.function.Supplier;
 public class FirebaseService {
   Firestore firestore = FirestoreClient.getFirestore();
 
-  public Product getProduct(String productId) throws ExecutionException, InterruptedException, ProductNotFoundException {
-    DocumentReference documentReference = firestore.collection("products").document(productId);
+  public Product getProduct(String gtin) throws ExecutionException, InterruptedException, ProductNotFoundException {
+    DocumentReference documentReference = firestore.collection("products").document(gtin);
     ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = documentReference.get();
     DocumentSnapshot documentSnapshot = documentSnapshotApiFuture.get();
     return Optional.ofNullable(documentSnapshot)

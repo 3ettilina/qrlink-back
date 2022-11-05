@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(BackendController.class)
 public class BackendControllerTest extends AbstractTest {
 
-  private final String GET_ENDPOINT = "/getProduct";
+  private final String GET_ENDPOINT = "/getProductResources";
 
   @Autowired
   private MockMvc mvc;
@@ -44,6 +44,7 @@ public class BackendControllerTest extends AbstractTest {
   public void init() throws InterruptedException, ExecutionException, ProductNotFoundException {
     product.setName("pepe");
     product.setResource_url("unaUrl.com");
+    product.setGtin("123");
     given(service.getProduct("123")).willReturn(product);
 
   }
@@ -51,11 +52,12 @@ public class BackendControllerTest extends AbstractTest {
 
 
   @Test
-  public void testShouldReturn307WhenCorrectCodeIsGiven() throws Exception {
+  public void testShouldReturn200WhenCorrectCodeIsGiven() throws Exception {
     mvc.perform(MockMvcRequestBuilders.get(GET_ENDPOINT)
             .contentType(MediaType.APPLICATION_JSON)
-            .param("productId","123"))
-            .andExpect(status().is3xxRedirection());
+            .header("Accept-Language","es")
+            .param("gtin","123"))
+            .andExpect(status().is2xxSuccessful());
   }
 
   @Test
