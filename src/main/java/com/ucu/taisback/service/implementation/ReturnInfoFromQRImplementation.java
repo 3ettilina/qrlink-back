@@ -21,13 +21,16 @@ public class ReturnInfoFromQRImplementation {
             .filter(resource -> Objects.nonNull(resource.getLanguage()) && resource.getLanguage().equals(languageHeader))
             .collect(Collectors.toList());
 
-    filteredProduct.setResources((ArrayList<Resource>) resources);
-    filteredProduct.setGtin(product.getGtin());
 
-    if(resources.size() > 1){
-      filteredProduct.setResource_url(product.getResource_url());
-      filteredProduct.setName(product.getName());
+    if(!(resources.size() == 0)){
+      filteredProduct.setResources((ArrayList<Resource>) resources);
     }
+    else{
+      filteredProduct.setResources(product.getResources());
+    }
+    filteredProduct.setGtin(product.getGtin());
+    filteredProduct.setResource_url(product.getResource_url());
+    filteredProduct.setName(product.getName());
 
     return filteredProduct;
   }
