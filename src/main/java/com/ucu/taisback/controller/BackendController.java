@@ -26,8 +26,9 @@ public class BackendController {
 
     @GetMapping("/getProductResources")
     Product returnInfoFromQR(@RequestHeader(value = HttpHeaders.ACCEPT_LANGUAGE, required = false) String languageHeader,
-            @RequestParam String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
-     return ReturnInfoFromQRImplementation.returnInfoFromQR(firebaseService.getProduct(gtin),languageHeader);
+            @RequestParam String gtin,
+            @RequestParam (required = false)String linkType) throws InterruptedException, ExecutionException, ProductNotFoundException {
+     return ReturnInfoFromQRImplementation.returnInfoFromQR(firebaseService.getProduct(gtin),languageHeader, linkType);
     }
 
     @GetMapping("/admin/product")
