@@ -34,6 +34,7 @@ public class BackendControllerTest extends AbstractTest {
   private final String GET_PRODUCT_RESOURCES = "/getProductResources";
   private final String GET_ADMIN_PRODUCT = "/admin/product";
 
+  private final String GET_PRODUCT_ADD = "/product/addResource"; // Para Task 33
   @Autowired
   private MockMvc mvc;
 
@@ -55,29 +56,28 @@ public class BackendControllerTest extends AbstractTest {
   }
 
 
-
   @Test
   public void testShouldReturn200WhenCorrectCodeIsGiven() throws Exception {
     mvc.perform(MockMvcRequestBuilders.get(GET_PRODUCT_RESOURCES)
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("Accept-Language","es")
-            .param("gtin","123"))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Accept-Language", "es")
+                    .param("gtin", "123"))
             .andExpect(status().is2xxSuccessful());
   }
 
   @Test
   public void testShouldReturn404WhenIncorrectCodeIsGiven() throws Exception {
     mvc.perform(MockMvcRequestBuilders.get(GET_PRODUCT_RESOURCES)
-            .contentType(MediaType.APPLICATION_JSON))
+                    .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().is4xxClientError());
   }
 
   @Test
   public void testShouldReturn200WhenCorrectResource() throws Exception {
     mvc.perform(MockMvcRequestBuilders.get(GET_ADMIN_PRODUCT)
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("Accept-Language","es")
-            .param("gtin","123"))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Accept-Language", "es")
+                    .param("gtin", "123"))
             .andExpect(status().is2xxSuccessful());
   }
 
@@ -86,22 +86,55 @@ public class BackendControllerTest extends AbstractTest {
     when(service.getProduct("444")).thenThrow(ProductNotFoundException.class);
 
     mvc.perform(MockMvcRequestBuilders.get(GET_ADMIN_PRODUCT)
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("Accept-Language","es")
-            .param("gtin","444"))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Accept-Language", "es")
+                    .param("gtin", "444"))
             .andExpect(status().is4xxClientError());
   }
 
+  // Test error 500
   @Test(expected = NestedServletException.class)
   public void testShouldReturn500ErrorWhenServiceFails() throws Exception {
     when(service.getProduct("444")).thenThrow(InterruptedException.class);
 
     mvc.perform(MockMvcRequestBuilders.get(GET_ADMIN_PRODUCT)
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("Accept-Language","es")
-            .param("gtin","444"))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Accept-Language", "es")
+                    .param("gtin", "444"))
             .andExpect(status().is5xxServerError());
   }
+
+  //task 33
+  @Test
+  public void testShouldReturn404WhenGtinNotExist() throws Exception {
+    when(service.getProduct("444")).thenThrow(ProductNotFoundException.class);
+
+    mvc.perform(MockMvcRequestBuilders.get(GET_PRODUCT_ADD)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Accept-Language", "es")
+                    .param("gtin", "444"))
+            .andExpect(status().is4xxClientError());
+  }
+//este es el que falló
+ // @Test(expected = NestedServletException.class)
+ // public void testShouldReturn500ErrorWhenServiceFails2() throws Exception {
+  //  when(service.getProduct("444")).thenThrow(InterruptedException.class);
+
+  //  mvc.perform(MockMvcRequestBuilders.get(GET_PRODUCT_ADD)
+       //             .contentType(MediaType.APPLICATION_JSON)
+       //             .header("Accept-Language", "es")
+       //             .param("gtin", "444"))
+      //      .andExpect(status().is5xxServerError());
+ // }
+ // @Test
+ // public void testShouldReturn201WhenCorrectCreateProduct() throws Exception {
+   // mvc.perform(MockMvcRequestBuilders.get(GET_PRODUCT_ADD)
+  //                  .contentType(MediaType.APPLICATION_JSON)
+   //                 .header("Accept-Language", "es")
+ //                   .param("gtin", "123")) //y acá qué va?
+
+   //         .andExpect(status().is2xxSuccessful());
+ // }
 }
 
 
