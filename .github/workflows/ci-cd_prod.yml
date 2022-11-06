@@ -23,6 +23,17 @@ jobs:
       # Get project's code from branch
       - name: Checkout branch
         uses: actions/checkout@v3
+
+      # Configure JAVA
+      - name: Setup JAVA
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      # Run Unit Tests
+      - name: Run Tests
+        run: mvn test -Dtest="com.ucu.taisback.**"
         
       # Autenticate to be able to deploy the app
       - name: 'Authenticate to Google Cloud'
