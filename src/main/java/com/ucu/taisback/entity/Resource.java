@@ -3,14 +3,12 @@ package com.ucu.taisback.entity;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-
 @Getter
 @Setter
-public class Product {
-
-  private String gtin;
+public class Resource {
   private String name;
+  private String link_type;
+  private String language;
   private String resource_url;
-  private ArrayList<Resource> resources;
 }
+
