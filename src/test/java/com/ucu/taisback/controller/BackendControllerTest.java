@@ -3,9 +3,11 @@ package com.ucu.taisback.controller;
 
 import com.ucu.taisback.controller.util.AbstractTest;
 import com.ucu.taisback.entity.Product;
+import com.ucu.taisback.entity.Resource;
 import com.ucu.taisback.exceptions.ProductNotFoundException;
 import com.ucu.taisback.service.FirebaseService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -21,8 +23,10 @@ import org.springframework.web.util.NestedServletException;
 import java.rmi.ServerError;
 import java.util.concurrent.ExecutionException;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -109,32 +113,37 @@ public class BackendControllerTest extends AbstractTest {
   public void testShouldReturn404WhenGtinNotExist() throws Exception {
     when(service.getProduct("444")).thenThrow(ProductNotFoundException.class);
 
-    mvc.perform(MockMvcRequestBuilders.get(GET_PRODUCT_ADD)
+    mvc.perform(MockMvcRequestBuilders.post(GET_PRODUCT_ADD)
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Accept-Language", "es")
                     .param("gtin", "444"))
             .andExpect(status().is4xxClientError());
   }
-//este es el que falló
- // @Test(expected = NestedServletException.class)
- // public void testShouldReturn500ErrorWhenServiceFails2() throws Exception {
-  //  when(service.getProduct("444")).thenThrow(InterruptedException.class);
 
-  //  mvc.perform(MockMvcRequestBuilders.get(GET_PRODUCT_ADD)
-       //             .contentType(MediaType.APPLICATION_JSON)
-       //             .header("Accept-Language", "es")
-       //             .param("gtin", "444"))
-      //      .andExpect(status().is5xxServerError());
- // }
- // @Test
- // public void testShouldReturn201WhenCorrectCreateProduct() throws Exception {
-   // mvc.perform(MockMvcRequestBuilders.get(GET_PRODUCT_ADD)
-  //                  .contentType(MediaType.APPLICATION_JSON)
-   //                 .header("Accept-Language", "es")
- //                   .param("gtin", "123")) //y acá qué va?
+  @Ignore
+  @Test(expected = NestedServletException.class)
+  public void testShouldReturn500ErrorWhenServiceFails2() throws Exception {
+    doThrow(InterruptedException.class)
+            .when(service)
+            .updateResources("444",null);
 
-   //         .andExpect(status().is2xxSuccessful());
- // }
+    mvc.perform(MockMvcRequestBuilders.post(GET_PRODUCT_ADD)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Accept-Language", "es")
+            .param("gtin", "444"))
+            .andExpect(status().is5xxServerError()); //esta dando un product not found
+
+  }
+  @Ignore
+  @Test
+    public void testShouldReturn201WhenCorrectCreateProduct() throws Exception {
+    mvc.perform(MockMvcRequestBuilders.post(GET_PRODUCT_ADD)
+      .contentType(MediaType.APPLICATION_JSON)
+      .header("Accept-Language", "es")
+      .param("gtin", "123"))
+
+      .andExpect(status().is2xxSuccessful());
+  }
 }
 
 
