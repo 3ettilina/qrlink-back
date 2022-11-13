@@ -13,13 +13,16 @@ public class ReturnInfoFromQRImplementation {
 
   public static Product returnInfoFromQR(Product product,String languageHeader,String linkType){
     Product filteredProduct = new Product();
+    List<Resource> resources = product.getResources();
 
-    List<Resource> resources =  Optional.ofNullable(product.getResources())
-          .orElse(new ArrayList<>())
-            .stream()
-            .filter(resource -> Objects.nonNull(resource.getLanguage())
-                    && resource.getLanguage().equals(languageHeader))
-            .collect(Collectors.toList());
+    if(Objects.nonNull(languageHeader)) {
+      resources = Optional.ofNullable(product.getResources())
+              .orElse(new ArrayList<>())
+              .stream()
+              .filter(resource -> Objects.nonNull(resource.getLanguage())
+                      && resource.getLanguage().equals(languageHeader))
+              .collect(Collectors.toList());
+    }
 
     if(Objects.nonNull(linkType)){
       List filteredResources = Optional.ofNullable(resources)
