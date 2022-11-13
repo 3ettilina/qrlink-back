@@ -48,8 +48,7 @@ public class BackendControllerTest extends AbstractTest {
 
   @Before
   public void init() throws InterruptedException, ExecutionException, ProductNotFoundException {
-    product.setName("pepe");
-    product.setResource_url("unaUrl.com");
+
     product.setGtin("123");
     given(service.getProduct("123")).willReturn(product);
   }

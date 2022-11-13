@@ -42,8 +42,6 @@ public class ReturnInfoFromQRImplementation {
       filteredProduct.setResources(product.getResources());
     }
     filteredProduct.setGtin(product.getGtin());
-    filteredProduct.setResource_url(product.getResource_url());
-    filteredProduct.setName(product.getName());
 
     return filteredProduct;
   }
