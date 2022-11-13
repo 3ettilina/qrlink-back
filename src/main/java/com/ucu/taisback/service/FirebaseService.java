@@ -9,6 +9,7 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.ucu.taisback.entity.Product;
 import com.ucu.taisback.entity.Resource;
 import com.ucu.taisback.exceptions.ProductNotFoundException;
+import com.ucu.taisback.service.implementation.AddProductImplementation;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -46,6 +47,12 @@ public class FirebaseService {
      //TODO: definir status code y eso
       throw new ProductNotFoundException("El recurso ya existe");
    }
+  }
 
+  public Product addResource(Product product){
+    AddProductImplementation.buildProduct(product);
+    ApiFuture<WriteResult> collectionsApiFuture =
+            firestore.collection("products").document(product.getGtin()).set(product);
+    return product;
   }
 }

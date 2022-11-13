@@ -10,7 +10,6 @@ import java.util.ArrayList;
 public class Product {
 
   private String gtin;
-  private String name;
-  private String resource_url;
   private ArrayList<Resource> resources;
+  private boolean only_redirect;
 }
