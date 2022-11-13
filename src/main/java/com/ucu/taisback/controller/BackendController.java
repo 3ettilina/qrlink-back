@@ -40,4 +40,9 @@ public class BackendController {
     void addResource(@RequestParam String gtin,  @RequestBody Resource resource) throws InterruptedException, ExecutionException, ProductNotFoundException {
       firebaseService.updateResources(gtin, resource);
     }
+
+  @PostMapping("/product/addProduct")
+  Product addResource( @RequestBody Product product) throws InterruptedException, ExecutionException, ProductNotFoundException {
+    return firebaseService.addResource(product);
+  }
 }
