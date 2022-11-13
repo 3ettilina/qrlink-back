@@ -5,6 +5,7 @@ import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
@@ -65,9 +66,15 @@ public class FirebaseService {
     ApiFuture<QuerySnapshot> documentSnapshotApiFuture = documentReference.get();
     QuerySnapshot documentSnapshot = documentSnapshotApiFuture.get();
 
-    return documentSnapshot.getDocuments().stream()
-            .map(queryDocumentSnapshot -> queryDocumentSnapshot.toObject(LinkType.class))
+    return   documentSnapshot.getDocuments().stream()
+            .map(this::buildLinkType)
             .collect(Collectors.toList());
+  }
 
+  private LinkType buildLinkType(QueryDocumentSnapshot queryDocumentSnapshot){
+    String id = queryDocumentSnapshot.getId();
+    LinkType linkType = queryDocumentSnapshot.toObject(LinkType.class);
+    linkType.setId(id);
+    return linkType;
   }
 }
