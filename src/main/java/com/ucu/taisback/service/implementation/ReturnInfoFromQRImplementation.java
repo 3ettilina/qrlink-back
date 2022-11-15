@@ -16,25 +16,19 @@ public class ReturnInfoFromQRImplementation {
     List<Resource> resources = product.getResources();
 
     if(Objects.nonNull(languageHeader)) {
-      resources = Optional.ofNullable(product.getResources())
-              .orElse(new ArrayList<>())
-              .stream()
-              .filter(resource -> Objects.nonNull(resource.getLanguage())
-                      && resource.getLanguage().equals(languageHeader))
-              .collect(Collectors.toList());
+      resources = filterByLanguageHeader(product, languageHeader);
     }
 
     if(Objects.nonNull(linkType)){
-      List filteredResources = Optional.ofNullable(resources)
-              .orElse(new ArrayList<>())
-              .stream()
-              .filter(resource -> Objects.nonNull(resource.getLink_type())
-                      && resource.getLink_type().equals(linkType))
-              .collect(Collectors.toList());
-      if (!filteredResources.isEmpty()){
-        resources = filteredResources;
-      }
+      resources = filterByLinkType(linkType, resources);
     }
+
+    buildProduct(product, filteredProduct, resources);
+
+    return filteredProduct;
+  }
+
+  private static void buildProduct(Product product, Product filteredProduct, List<Resource> resources) {
     if(!(resources.size() == 0)){
       filteredProduct.setResources((ArrayList<Resource>) resources);
     }
@@ -42,8 +36,28 @@ public class ReturnInfoFromQRImplementation {
       filteredProduct.setResources(product.getResources());
     }
     filteredProduct.setGtin(product.getGtin());
+  }
 
-    return filteredProduct;
+  private static List<Resource> filterByLinkType(String linkType, List<Resource> resources) {
+    List filteredResources = Optional.ofNullable(resources)
+            .orElse(new ArrayList<>())
+            .stream()
+            .filter(resource -> Objects.nonNull(resource.getLink_type())
+                    && resource.getLink_type().equals(linkType))
+            .collect(Collectors.toList());
+    if (!filteredResources.isEmpty()){
+      resources = filteredResources;
+    }
+    return resources;
+  }
+
+  private static List<Resource> filterByLanguageHeader(Product product, String languageHeader) {
+    return Optional.ofNullable(product.getResources())
+            .orElse(new ArrayList<>())
+            .stream()
+            .filter(resource -> Objects.nonNull(resource.getLanguage())
+                    && resource.getLanguage().equals(languageHeader))
+            .collect(Collectors.toList());
   }
 
 }
