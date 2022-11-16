@@ -8,6 +8,7 @@ import com.ucu.taisback.exceptions.ProductNotFoundException;
 import com.ucu.taisback.service.FirebaseService;
 import com.ucu.taisback.service.implementation.ReturnInfoFromQRImplementation;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -43,13 +44,19 @@ public class BackendController {
       firebaseService.updateResources(gtin, resource);
     }
 
-  @PostMapping("/product/addProduct")
-  Product addResource( @RequestBody Product product) throws InterruptedException, ExecutionException, ProductNotFoundException {
-    return firebaseService.addResource(product);
-  }
+    @PostMapping("/product/addProduct")
+    Product addResource( @RequestBody Product product)  {
+      return firebaseService.addResource(product);
+    }
 
-  @GetMapping("/admin/getLinkTypeList")
-  List<LinkType> getProductInformation() throws InterruptedException, ExecutionException, ProductNotFoundException {
-    return firebaseService.getAllLinkTypes();
-  }
+    @GetMapping("/admin/getLinkTypeList")
+    List<LinkType> getProductInformation() throws InterruptedException, ExecutionException {
+      return firebaseService.getAllLinkTypes();
+    }
+
+    @PatchMapping("/product/editResource")
+    Resource editProduct(@RequestParam String gtin,
+                         @RequestBody Resource resource) throws InterruptedException, ExecutionException, ProductNotFoundException {
+      return firebaseService.editResource(resource,gtin);
+    }
 }
