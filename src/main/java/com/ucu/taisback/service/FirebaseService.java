@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,6 +62,15 @@ public class FirebaseService {
     return product;
   }
 
+  public Resource editResource(Resource resource, String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
+    Product product = getProduct(gtin);
+    ArrayList<Resource> resources = buildResources(product, resource);
+    product.setResources(resources);
+    ApiFuture<WriteResult> collectionsApiFuture =
+            firestore.collection("products").document(product.getGtin()).set(product);
+    return resource;
+  }
+
   public List<LinkType> getAllLinkTypes() throws ExecutionException, InterruptedException {
     CollectionReference documentReference = firestore.collection("link_types");
     ApiFuture<QuerySnapshot> documentSnapshotApiFuture = documentReference.get();
@@ -76,5 +86,34 @@ public class FirebaseService {
     LinkType linkType = queryDocumentSnapshot.toObject(LinkType.class);
     linkType.setId(id);
     return linkType;
+  }
+
+  private ArrayList<Resource> buildResources(Product product,Resource resource) throws ProductNotFoundException {
+    if (Optional.ofNullable(product.getResources())
+            .orElse(new ArrayList<>())
+            .stream()
+            .anyMatch(r ->matcher(r,resource)) ){
+
+      ArrayList<Resource> resources=
+       product.getResources()
+              .stream()
+              .filter(r ->!matcher(r,resource) )
+              .collect(Collectors.toCollection(ArrayList::new));
+      resources.add(resource);
+      return resources;
+    }
+    else{
+      throw new ProductNotFoundException("No se encontro el recurso");
+    }
+  }
+
+  protected boolean matcher(Resource resource, Resource newResource){
+    BiFunction<String, String, Boolean> matchByLinkType = (s1,s2) -> Objects.nonNull(s1) && Objects.nonNull(s2) && s1.equals(s2);
+    BiFunction<String, String, Boolean> matchByName = (s1,s2) -> Objects.nonNull(s1) && Objects.nonNull(s2) && s1.equals(s2);
+    BiFunction<String, String, Boolean> matchByLanguage = (s1,s2) -> Objects.nonNull(s1) && Objects.nonNull(s2) && s1.equals(s2);
+
+    return matchByLanguage.apply(resource.getLanguage(),newResource.getLanguage())
+            && matchByLinkType.apply(resource.getLink_type(),newResource.getLink_type())
+            && matchByName.apply(resource.getName(),newResource.getName());
   }
 }
