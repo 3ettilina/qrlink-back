@@ -1,6 +1,7 @@
 package com.ucu.taisback.controller;
 
 import com.google.common.net.HttpHeaders;
+import com.ucu.taisback.entity.LinkType;
 import com.ucu.taisback.entity.Product;
 import com.ucu.taisback.entity.Resource;
 import com.ucu.taisback.exceptions.ProductNotFoundException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -44,5 +46,10 @@ public class BackendController {
   @PostMapping("/product/addProduct")
   Product addResource( @RequestBody Product product) throws InterruptedException, ExecutionException, ProductNotFoundException {
     return firebaseService.addResource(product);
+  }
+
+  @GetMapping("/admin/getLinkTypeList")
+  List<LinkType> getProductInformation() throws InterruptedException, ExecutionException, ProductNotFoundException {
+    return firebaseService.getAllLinkTypes();
   }
 }

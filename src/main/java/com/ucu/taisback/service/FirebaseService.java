@@ -1,22 +1,27 @@
 package com.ucu.taisback.service;
 
 import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
 import com.ucu.taisback.entity.Product;
 import com.ucu.taisback.entity.Resource;
+import com.ucu.taisback.entity.LinkType;
 import com.ucu.taisback.exceptions.ProductNotFoundException;
 import com.ucu.taisback.service.implementation.AddProductImplementation;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Service
 public class FirebaseService {
@@ -54,5 +59,22 @@ public class FirebaseService {
     ApiFuture<WriteResult> collectionsApiFuture =
             firestore.collection("products").document(product.getGtin()).set(product);
     return product;
+  }
+
+  public List<LinkType> getAllLinkTypes() throws ExecutionException, InterruptedException {
+    CollectionReference documentReference = firestore.collection("link_types");
+    ApiFuture<QuerySnapshot> documentSnapshotApiFuture = documentReference.get();
+    QuerySnapshot documentSnapshot = documentSnapshotApiFuture.get();
+
+    return   documentSnapshot.getDocuments().stream()
+            .map(this::buildLinkType)
+            .collect(Collectors.toList());
+  }
+
+  private LinkType buildLinkType(QueryDocumentSnapshot queryDocumentSnapshot){
+    String id = queryDocumentSnapshot.getId();
+    LinkType linkType = queryDocumentSnapshot.toObject(LinkType.class);
+    linkType.setId(id);
+    return linkType;
   }
 }
