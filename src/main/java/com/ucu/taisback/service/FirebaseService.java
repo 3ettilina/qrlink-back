@@ -81,6 +81,11 @@ public class FirebaseService {
             .collect(Collectors.toList());
   }
 
+  public void deleteProduct(String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
+    getProduct(gtin); //para chequear que existe
+    firestore.collection("products").document(gtin).delete();
+  }
+
   private LinkType buildLinkType(QueryDocumentSnapshot queryDocumentSnapshot){
     String id = queryDocumentSnapshot.getId();
     LinkType linkType = queryDocumentSnapshot.toObject(LinkType.class);

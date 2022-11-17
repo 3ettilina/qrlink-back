@@ -7,6 +7,7 @@ import com.ucu.taisback.entity.Resource;
 import com.ucu.taisback.exceptions.ProductNotFoundException;
 import com.ucu.taisback.service.FirebaseService;
 import com.ucu.taisback.service.implementation.ReturnInfoFromQRImplementation;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,5 +59,10 @@ public class BackendController {
     Resource editProduct(@RequestParam String gtin,
                          @RequestBody Resource resource) throws InterruptedException, ExecutionException, ProductNotFoundException {
       return firebaseService.editResource(resource,gtin);
+    }
+
+    @DeleteMapping("/product/delete")
+    void deleteProduct(@RequestParam String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
+      firebaseService.deleteProduct(gtin);
     }
 }
