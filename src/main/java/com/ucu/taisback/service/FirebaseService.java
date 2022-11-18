@@ -81,6 +81,16 @@ public class FirebaseService {
             .collect(Collectors.toList());
   }
 
+  public List<Product> getAllProducts() throws ExecutionException, InterruptedException {
+    CollectionReference documentReference = firestore.collection("products");
+    ApiFuture<QuerySnapshot> documentSnapshotApiFuture = documentReference.get();
+    QuerySnapshot documentSnapshot = documentSnapshotApiFuture.get();
+
+    return   documentSnapshot.getDocuments().stream()
+            .map(queryDocumentSnapshot -> queryDocumentSnapshot.toObject(Product.class))
+            .collect(Collectors.toList());
+  }
+
   public void deleteProduct(String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
     getProduct(gtin); //para chequear que existe
     firestore.collection("products").document(gtin).delete();
