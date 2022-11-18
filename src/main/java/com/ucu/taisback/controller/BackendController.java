@@ -65,4 +65,10 @@ public class BackendController {
     void deleteProduct(@RequestParam String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
       firebaseService.deleteProduct(gtin);
     }
+
+  @GetMapping("/product/getProducts")
+  List<Product> getProducts() throws InterruptedException, ExecutionException {
+    return firebaseService.getAllProducts();
+  }
+
 }
