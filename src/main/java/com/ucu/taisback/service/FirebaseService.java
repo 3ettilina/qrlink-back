@@ -96,6 +96,18 @@ public class FirebaseService {
     firestore.collection("products").document(gtin).delete();
   }
 
+  public void deleteResource(String gtin,Resource resource) throws InterruptedException, ExecutionException, ProductNotFoundException {
+    Product product = getProduct(gtin);
+    ArrayList<Resource> resources = product.getResources()
+            .stream()
+            .filter(r -> !matcher(resource,r) )
+            .collect(Collectors.toCollection(ArrayList::new));
+
+    product.setResources(resources);
+    firestore.collection("products").document(product.getGtin()).set(product);
+
+  }
+
   private LinkType buildLinkType(QueryDocumentSnapshot queryDocumentSnapshot){
     String id = queryDocumentSnapshot.getId();
     LinkType linkType = queryDocumentSnapshot.toObject(LinkType.class);
@@ -123,12 +135,20 @@ public class FirebaseService {
   }
 
   protected boolean matcher(Resource resource, Resource newResource){
-    BiFunction<String, String, Boolean> matchByLinkType = (s1,s2) -> Objects.nonNull(s1) && Objects.nonNull(s2) && s1.equals(s2);
-    BiFunction<String, String, Boolean> matchByName = (s1,s2) -> Objects.nonNull(s1) && Objects.nonNull(s2) && s1.equals(s2);
-    BiFunction<String, String, Boolean> matchByLanguage = (s1,s2) -> Objects.nonNull(s1) && Objects.nonNull(s2) && s1.equals(s2);
+    BiFunction<String, String, Boolean> matchByField = (s1,s2) -> {
+     if (Objects.isNull(s1) && Objects.isNull(s2)){
+       return true;
+     }
+     else if( Objects.nonNull(s1) && Objects.nonNull(s2) && s1.equals(s2)){
+         return true;
+       }
+     else
+       return false;
+     };
 
-    return matchByLanguage.apply(resource.getLanguage(),newResource.getLanguage())
-            && matchByLinkType.apply(resource.getLink_type(),newResource.getLink_type())
-            && matchByName.apply(resource.getName(),newResource.getName());
+    return matchByField.apply(resource.getLanguage(),newResource.getLanguage())
+            && matchByField.apply(resource.getLink_type(),newResource.getLink_type())
+            && matchByField.apply(resource.getName(),newResource.getName())
+            && matchByField.apply(resource.getResource_url(),newResource.getResource_url());
   }
 }
