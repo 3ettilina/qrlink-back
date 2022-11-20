@@ -71,4 +71,9 @@ public class BackendController {
     return firebaseService.getAllProducts();
   }
 
+  @PostMapping("/product/setOnlyRedirect")
+  Product switchRedirect( @RequestParam String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
+    return firebaseService.switchRedirect(gtin);
+  }
+
 }
