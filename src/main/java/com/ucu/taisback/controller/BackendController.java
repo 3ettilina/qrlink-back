@@ -73,7 +73,10 @@ public class BackendController {
 
   @PostMapping("/product/setOnlyRedirect")
   Product switchRedirect( @RequestParam String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
-    return firebaseService.switchRedirect(gtin);
+
+  @DeleteMapping("/product/deleteResource")
+  void deleteResource(@RequestParam String gtin,  @RequestBody Resource resource) throws InterruptedException, ExecutionException, ProductNotFoundException {
+    firebaseService.deleteResource(gtin, resource);
   }
 
 }
