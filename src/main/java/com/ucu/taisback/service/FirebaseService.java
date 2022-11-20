@@ -55,11 +55,19 @@ public class FirebaseService {
    }
   }
 
-  public Product addResource(Product product){
-    AddProductImplementation.buildProduct(product);
-    ApiFuture<WriteResult> collectionsApiFuture =
-            firestore.collection("products").document(product.getGtin()).set(product);
-    return product;
+  public Product addResource(Product product) throws ExecutionException, InterruptedException, ProductNotFoundException {
+    DocumentReference documentReference = firestore.collection("products").document(product.getGtin());
+    ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = documentReference.get();
+    DocumentSnapshot documentSnapshot = documentSnapshotApiFuture.get();
+    if(Objects.isNull(documentSnapshot)){
+      AddProductImplementation.buildProduct(product);
+      firestore.collection("products").document(product.getGtin()).set(product);
+      return product;
+    }
+    else{
+      throw new ProductNotFoundException("el producto ya existe");
+    }
+
   }
 
   public Resource editResource(Resource resource, String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
