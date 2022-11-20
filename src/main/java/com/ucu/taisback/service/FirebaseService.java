@@ -101,6 +101,7 @@ public class FirebaseService {
     product.setOnly_redirect(!product.isOnly_redirect());
     firestore.collection("products").document(gtin).set(product);
     return product;
+  }
 
   public void deleteResource(String gtin,Resource resource) throws InterruptedException, ExecutionException, ProductNotFoundException {
     Product product = getProduct(gtin);
