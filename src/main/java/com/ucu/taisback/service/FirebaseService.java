@@ -98,12 +98,7 @@ public class FirebaseService {
 
   public Product switchRedirect(String gtin) throws InterruptedException, ExecutionException, ProductNotFoundException {
     Product product = getProduct(gtin);
-    if(product.isOnly_redirect()){
-      product.setOnly_redirect(false);
-    }
-    else{
-      product.setOnly_redirect(true);
-    }
+    product.setOnly_redirect(!product.isOnly_redirect());
     firestore.collection("products").document(gtin).set(product);
     return product;
   }
