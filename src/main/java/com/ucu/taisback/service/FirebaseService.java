@@ -38,34 +38,45 @@ public class FirebaseService {
   }
 
   public void updateResources(String id, Resource resource) throws InterruptedException, ExecutionException, ProductNotFoundException {
-    Product product = getProduct(id);
-    ArrayList<Resource> resources = Optional.ofNullable(product.getResources())
-            .orElse(new ArrayList<>());
-   if(resources.stream()
-            .filter(resource1 -> Objects.nonNull(resource1.getLanguage()) && Objects.nonNull(resource1.getLink_type()))
-            .noneMatch(resource1 -> resource1.getLanguage().equals(resource.getLanguage())
-            && resource1.getLink_type().equals(resource.getLink_type()))){
-     resources.add(resource);
-     product.setResources(resources);
-     ApiFuture<WriteResult> writeResultApiFuture = firestore.collection("products").document(id).set(product);
-   }
-   else{
-     //TODO: definir status code y eso
-      throw new ProductNotFoundException("El recurso ya existe");
-   }
-  }
-
-  public Product addResource(Product product) throws ExecutionException, InterruptedException, ProductNotFoundException {
-    DocumentReference documentReference = firestore.collection("products").document(product.getGtin());
-    ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = documentReference.get();
-    Product documentSnapshot = documentSnapshotApiFuture.get().toObject(Product.class);
-    if(Objects.isNull(documentSnapshot)){
-      AddProductImplementation.buildProduct(product);
-      firestore.collection("products").document(product.getGtin()).set(product);
-      return product;
+    if(Objects.nonNull(resource.getName())){
+      Product product = getProduct(id);
+      ArrayList<Resource> resources = Optional.ofNullable(product.getResources())
+              .orElse(new ArrayList<>());
+      if(resources.stream()
+              .filter(resource1 -> Objects.nonNull(resource1.getLanguage()) && Objects.nonNull(resource1.getLink_type()))
+              .noneMatch(resource1 -> resource1.getLanguage().equals(resource.getLanguage())
+                      && resource1.getLink_type().equals(resource.getLink_type()))){
+        resources.add(resource);
+        product.setResources(resources);
+        ApiFuture<WriteResult> writeResultApiFuture = firestore.collection("products").document(id).set(product);
+      }
+      else{
+        //TODO: definir status code y eso
+        throw new ProductNotFoundException("El recurso ya existe");
+      }
     }
     else{
-      throw new ProductNotFoundException("el producto ya existe");
+      throw new ProductNotFoundException("Resource mal formado");
+
+    }
+  }
+
+  public Product addProduct(Product product) throws ExecutionException, InterruptedException, ProductNotFoundException {
+    if(Objects.nonNull(product.getResources().get(0).getName())){
+      DocumentReference documentReference = firestore.collection("products").document(product.getGtin());
+      ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = documentReference.get();
+      Product documentSnapshot = documentSnapshotApiFuture.get().toObject(Product.class);
+      if(Objects.isNull(documentSnapshot)){
+        AddProductImplementation.buildProduct(product);
+        firestore.collection("products").document(product.getGtin()).set(product);
+        return product;
+      }
+      else{
+        throw new ProductNotFoundException("el producto ya existe");
+      }
+    }
+    else{
+      throw new ProductNotFoundException("producto tiene resource mal formado");
     }
 
   }

@@ -47,7 +47,7 @@ public class BackendController {
 
     @PostMapping("/product/addProduct")
     Product addResource( @RequestBody Product product) throws InterruptedException, ExecutionException, ProductNotFoundException {
-      return firebaseService.addResource(product);
+      return firebaseService.addProduct(product);
     }
 
     @GetMapping("/admin/getLinkTypeList")
