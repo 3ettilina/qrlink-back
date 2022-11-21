@@ -58,7 +58,7 @@ public class FirebaseService {
   public Product addResource(Product product) throws ExecutionException, InterruptedException, ProductNotFoundException {
     DocumentReference documentReference = firestore.collection("products").document(product.getGtin());
     ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = documentReference.get();
-    DocumentSnapshot documentSnapshot = documentSnapshotApiFuture.get();
+    Product documentSnapshot = documentSnapshotApiFuture.get().toObject(Product.class);
     if(Objects.isNull(documentSnapshot)){
       AddProductImplementation.buildProduct(product);
       firestore.collection("products").document(product.getGtin()).set(product);
