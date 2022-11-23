@@ -1,12 +1,14 @@
 package com.ucu.taisback.controller;
 
-import com.google.common.net.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import com.ucu.taisback.entity.LinkType;
 import com.ucu.taisback.entity.Product;
 import com.ucu.taisback.entity.Resource;
 import com.ucu.taisback.exceptions.ProductNotFoundException;
 import com.ucu.taisback.service.FirebaseService;
 import com.ucu.taisback.service.implementation.ReturnInfoFromQRImplementation;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -23,16 +26,21 @@ import java.util.concurrent.ExecutionException;
 public class BackendController {
 
   private FirebaseService firebaseService;
+  MultiValueMap<String, String> headers = new HttpHeaders();
 
   public BackendController(FirebaseService firebaseService){
     this.firebaseService = firebaseService;
   }
 
     @GetMapping("/getProductResources")
-    Product returnInfoFromQR(@RequestHeader(value = HttpHeaders.ACCEPT_LANGUAGE, required = false) String languageHeader,
-            @RequestParam String gtin,
-            @RequestParam (required = false)String linkType) throws InterruptedException, ExecutionException, ProductNotFoundException {
-     return ReturnInfoFromQRImplementation.returnInfoFromQR(firebaseService.getProduct(gtin),languageHeader, linkType);
+    Product returnInfoFromQR(@RequestHeader(value = HttpHeaders.ACCEPT_LANGUAGE, required = false)
+                                                 String languageHeader,HttpServletResponse response,
+                                              @RequestParam String gtin,
+                                              @RequestParam (required = false)String linkType)
+            throws InterruptedException, ExecutionException, ProductNotFoundException {
+      Product product = ReturnInfoFromQRImplementation.returnInfoFromQR(firebaseService.getProduct(gtin),languageHeader, linkType);
+      response.setHeader("product",product.toString());
+      return product;
     }
 
     @GetMapping("/admin/product")
