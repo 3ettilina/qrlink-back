@@ -38,34 +38,45 @@ public class FirebaseService {
   }
 
   public void updateResources(String id, Resource resource) throws InterruptedException, ExecutionException, ProductNotFoundException {
-    Product product = getProduct(id);
-    ArrayList<Resource> resources = Optional.ofNullable(product.getResources())
-            .orElse(new ArrayList<>());
-   if(resources.stream()
-            .filter(resource1 -> Objects.nonNull(resource1.getLanguage()) && Objects.nonNull(resource1.getLink_type()))
-            .noneMatch(resource1 -> resource1.getLanguage().equals(resource.getLanguage())
-            && resource1.getLink_type().equals(resource.getLink_type()))){
-     resources.add(resource);
-     product.setResources(resources);
-     ApiFuture<WriteResult> writeResultApiFuture = firestore.collection("products").document(id).set(product);
-   }
-   else{
-     //TODO: definir status code y eso
-      throw new ProductNotFoundException("El recurso ya existe");
-   }
-  }
-
-  public Product addResource(Product product) throws ExecutionException, InterruptedException, ProductNotFoundException {
-    DocumentReference documentReference = firestore.collection("products").document(product.getGtin());
-    ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = documentReference.get();
-    DocumentSnapshot documentSnapshot = documentSnapshotApiFuture.get();
-    if(Objects.isNull(documentSnapshot)){
-      AddProductImplementation.buildProduct(product);
-      firestore.collection("products").document(product.getGtin()).set(product);
-      return product;
+    if(Objects.nonNull(resource.getName())){
+      Product product = getProduct(id);
+      ArrayList<Resource> resources = Optional.ofNullable(product.getResources())
+              .orElse(new ArrayList<>());
+      if(resources.stream()
+              .filter(resource1 -> Objects.nonNull(resource1.getLanguage()) && Objects.nonNull(resource1.getLink_type()))
+              .noneMatch(resource1 -> resource1.getLanguage().equals(resource.getLanguage())
+                      && resource1.getLink_type().equals(resource.getLink_type()))){
+        resources.add(resource);
+        product.setResources(resources);
+        ApiFuture<WriteResult> writeResultApiFuture = firestore.collection("products").document(id).set(product);
+      }
+      else{
+        //TODO: definir status code y eso
+        throw new ProductNotFoundException("El recurso ya existe");
+      }
     }
     else{
-      throw new ProductNotFoundException("el producto ya existe");
+      throw new ProductNotFoundException("Resource mal formado");
+
+    }
+  }
+
+  public Product addProduct(Product product) throws ExecutionException, InterruptedException, ProductNotFoundException {
+    if(Objects.nonNull(product.getResources().get(0).getName())){
+      DocumentReference documentReference = firestore.collection("products").document(product.getGtin());
+      ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = documentReference.get();
+      Product documentSnapshot = documentSnapshotApiFuture.get().toObject(Product.class);
+      if(Objects.isNull(documentSnapshot)){
+        AddProductImplementation.buildProduct(product);
+        firestore.collection("products").document(product.getGtin()).set(product);
+        return product;
+      }
+      else{
+        throw new ProductNotFoundException("el producto ya existe");
+      }
+    }
+    else{
+      throw new ProductNotFoundException("producto tiene resource mal formado");
     }
 
   }
@@ -134,12 +145,12 @@ public class FirebaseService {
     if (Optional.ofNullable(product.getResources())
             .orElse(new ArrayList<>())
             .stream()
-            .anyMatch(r ->matcher(r,resource)) ){
+            .anyMatch(r ->editResourceMatcher(r,resource)) ){
 
       ArrayList<Resource> resources=
        product.getResources()
               .stream()
-              .filter(r ->!matcher(r,resource) )
+              .filter(r ->!editResourceMatcher(r,resource) )
               .collect(Collectors.toCollection(ArrayList::new));
       resources.add(resource);
       return resources;
@@ -165,5 +176,22 @@ public class FirebaseService {
             && matchByField.apply(resource.getLink_type(),newResource.getLink_type())
             && matchByField.apply(resource.getName(),newResource.getName())
             && matchByField.apply(resource.getResource_url(),newResource.getResource_url());
+  }
+
+  protected boolean editResourceMatcher(Resource resource, Resource newResource){
+    BiFunction<String, String, Boolean> matchByField = (s1,s2) -> {
+      if (Objects.isNull(s1) && Objects.isNull(s2)){
+        return true;
+      }
+      else if( Objects.nonNull(s1) && Objects.nonNull(s2) && s1.equals(s2)){
+        return true;
+      }
+      else
+        return false;
+    };
+
+    return matchByField.apply(resource.getLanguage(),newResource.getLanguage())
+            && matchByField.apply(resource.getLink_type(),newResource.getLink_type())
+            && matchByField.apply(resource.getName(),newResource.getName());
   }
 }

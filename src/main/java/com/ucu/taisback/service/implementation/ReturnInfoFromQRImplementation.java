@@ -15,16 +15,20 @@ public class ReturnInfoFromQRImplementation {
     Product filteredProduct = new Product();
     List<Resource> resources = product.getResources();
 
-    if(Objects.nonNull(languageHeader)) {
-      resources = filterByLanguageHeader(product, languageHeader);
-    }
+    if(!product.isOnly_redirect()){
+      if(Objects.nonNull(languageHeader)) {
+        resources = filterByLanguageHeader(product, languageHeader);
+      }
 
-    if(Objects.nonNull(linkType)){
-      resources = filterByLinkType(linkType, resources);
-    }
+      if(Objects.nonNull(linkType)){
+        resources = filterByLinkType(linkType, resources);
+      }
 
+    }
+    else{
+      resources = filterByDefaultLink(resources);
+    }
     buildProduct(product, filteredProduct, resources);
-
     return filteredProduct;
   }
 
@@ -36,6 +40,16 @@ public class ReturnInfoFromQRImplementation {
       filteredProduct.setResources(product.getResources());
     }
     filteredProduct.setGtin(product.getGtin());
+    filteredProduct.setOnly_redirect(product.isOnly_redirect());
+  }
+
+
+  private static List<Resource> filterByDefaultLink(List<Resource> resources){
+    return Optional.ofNullable(resources)
+            .orElse(new ArrayList<>())
+            .stream()
+            .filter(resource -> resource.getLink_type().equalsIgnoreCase("gs1:defaultLink"))
+            .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private static List<Resource> filterByLinkType(String linkType, List<Resource> resources) {
